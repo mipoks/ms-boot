@@ -75,7 +75,7 @@ public class Config implements WebMvcConfigurer {
   @Bean
   public HikariConfig hikariConfig() {
     HikariConfig hikariConfig = new HikariConfig();
-    hikariConfig.setJdbcUrl(environment.getProperty("db.url"));
+    hikariConfig.setJdbcUrl(environment.getProperty("spring.datasource.url"));
     hikariConfig.setMaximumPoolSize(Integer.parseInt(environment.getProperty("db.hikari.max-pool-size")));
     hikariConfig.setUsername(environment.getProperty("db.username"));
     hikariConfig.setPassword(environment.getProperty("db.password"));
@@ -99,7 +99,7 @@ public class Config implements WebMvcConfigurer {
 
   private Properties additionalProperties() {
     Properties properties = new Properties();
-    properties.setProperty("hibernate.hbm2ddl.auto", "update");
+    properties.setProperty("hibernate.hbm2ddl.auto", "create");
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL95Dialect");
     properties.setProperty("hibernate.show_sql", "true");
     return properties;

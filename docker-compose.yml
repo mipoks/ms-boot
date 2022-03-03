@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  frontend:
+    image: openjdk:11
+    container_name: front
+    ports:
+    - 8081:8081
+    build:
+      context: .
+      dockerfile: ./front-module/Dockerfile
+    depends_on:
+      - backend
+
+  postgres:
+    container_name: db-postgres
+    # Docker Hub image
+    image: postgres
+    # Provide the password for postgres
+    environment:
+      - JDBC_DATABASE_USERNAME=postgres
+      - JDBC_DATABASE_PASSWORD=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+#      - JDBC_DATABASE_URL=jdbc:postgresql://database:5432/medok
+    # Set health checks to wait until postgres has started
+    ports:
+      - 5433:5432
+#      - 127.0.0.1:5433:5432
+    networks:
+      back-network:
+        ipv4_address: 172.20.0.5
+
+  backend:
+    image: openjdk:11
+    container_name: back
+    ports:
+      - 8080:8080
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      back-network:
+        ipv4_address: 172.20.0.6
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5433/postgres
+
+networks:
+  back-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
