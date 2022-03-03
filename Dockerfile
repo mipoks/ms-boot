@@ -17,6 +17,6 @@
 ##CMD java -jar krst-projects-1.0.0.jar
 
 FROM openjdk:11
-ARG JAR_FILE=ms-boot/target/*.jar
+ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
