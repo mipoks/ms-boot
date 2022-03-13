@@ -1,6 +1,7 @@
 package design.kfu.front;
 
 import design.kfu.config.security.details.UserDetailsImpl;
+import design.kfu.entity.chat.PersonInfo;
 import design.kfu.entity.dto.PersonForm;
 import design.kfu.entity.music.Person;
 import design.kfu.entity.music.Song;
@@ -116,5 +117,21 @@ class BackendModuleApplicationTests {
 				.build();
 		long result = profileService.update(personForm, person);
 		assertEquals(result, 1);
+	}
+
+	@Test
+	void personMusicServiceTest() {
+		UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername("wow@test.ru");
+		Person person = userDetails.getUser();
+		Set<Song> songs = personMusicService.getMusic(person);
+		assertEquals(songs.size(), 0);
+	}
+
+	@Test
+	void personServiceTest() {
+		UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername("wow@test.ru");
+		Person person = userDetails.getUser();
+		PersonInfo personInfo = personService.getPersonInfo(person.getId());
+		assertNotNull(personInfo);
 	}
 }
