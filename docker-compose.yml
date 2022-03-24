@@ -5,7 +5,7 @@ services:
     image: openjdk:11
     container_name: front
     ports:
-    - 8081:8081
+      - 8081:8081
     build:
       context: .
       dockerfile: ./front-module/Dockerfile
@@ -22,11 +22,11 @@ services:
       - JDBC_DATABASE_PASSWORD=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-#      - JDBC_DATABASE_URL=jdbc:postgresql://database:5432/medok
+    #      - JDBC_DATABASE_URL=jdbc:postgresql://database:5432/medok
     # Set health checks to wait until postgres has started
     ports:
       - 5433:5432
-#      - 127.0.0.1:5433:5432
+    #      - 127.0.0.1:5433:5432
     networks:
       back-network:
         ipv4_address: 172.20.0.5
@@ -46,6 +46,32 @@ services:
         ipv4_address: 172.20.0.6
     environment:
       - DB_URL=jdbc:postgresql://host.docker.internal:5433/postgres
+
+  promtail:
+    image: grafana/promtail:2.1.0
+    container_name: monitoring-promtail
+    volumes:
+      - ./promtail/promtail-docker-config.yaml:/etc/promtail/docker-config.yaml
+      - ../logs/monitoring.log:/var/log/monitoring.log
+    command: "--config.file=/etc/promtail/docker-config.yaml"
+  loki:
+    image: grafana/loki:2.1.0
+    container_name: monitoring-loki
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+  grafana:
+    image: grafana/grafana:8.2.6
+    container_name: monitoring-grafana
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./grafana/example.json:/var/lib/grafana/dashboards/example.json
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
 
 networks:
   back-network:
